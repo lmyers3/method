@@ -1,20 +1,25 @@
 const express = require('express')
+const router = express.Router()
 const multer = require('multer')
 const path = require('path')
-const router = express.Router()
+const payInstrController = require('../controllers/paymentinstruction')
+
+const filePath = path.join(__dirname,'..', '/uploads/')
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, path.join(__dirname,'..', '/uploads/'))
+      cb(null, filePath)
     },
     filename: function (req, file, cb) {
       cb(null, file.originalname)
     }
 })
+
 //create multer instance
 var upload = multer({ storage: storage })
 
-router.post('/payment-instruction', upload.array("file"), (req, res) => {
+router.post('/payment-instruction', [upload.single("file"), payInstrController.initialize], (req, res) => {
+
     res.json({status: "files recieved"})
 })
 
