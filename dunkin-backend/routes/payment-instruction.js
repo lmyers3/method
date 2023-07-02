@@ -18,7 +18,7 @@ var storage = multer.diskStorage({
 //create multer instance
 var upload = multer({ storage: storage })
 
-router.post('/payment-instruction', [upload.single("file"), payInstrController.initialize], (req, res) => {
+router.post('/payment-instruction', [upload.single("file"), payInstrController.process], (req, res) => {
 
     res.json({status: "files recieved"})
 })

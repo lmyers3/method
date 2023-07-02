@@ -2,12 +2,13 @@ const path = require('path')
 const fs = require('fs')
 const XmlStream = require('xml-stream')
 const Dinero = require('dinero.js')
+const MerchantCache = require('./cache')
 
 const filePath = path.join(__dirname,'..', '/uploads/')
 
 const payments = {}
 
-const initialize = (req, res, next) => {
+const process = (req, res, next) => {
     console.log(`Reading file from ${req.file.filename}`)
 
     const stream = fs.createReadStream(path.join(filePath, req.file.filename))
@@ -15,9 +16,8 @@ const initialize = (req, res, next) => {
 
     const xml = new XmlStream(stream)
 
-    let i = 0;
     xml.on('endElement: row', (chunk) => {
-      getDestAccount(chunk)
+      initData(chunk)
     })
 
     xml.on('end', () => {
@@ -31,7 +31,7 @@ const initialize = (req, res, next) => {
     next()
 }
 
-const getDestAccount = (chunk) => {
+const initData = (chunk) => {
   let branchId = getBranch(chunk)
   let employeeId = getEmployee(chunk)
   let accountNumber = getAccount(chunk)
@@ -43,28 +43,23 @@ const getDestAccount = (chunk) => {
   if (employee) {
     let account = employee['accounts'].find(ele => ele.accountNumber === accountNumber)
     if (account) {
+      //aggregate payment
       let origAmount = getDinero(account.amount)
       account.amount = origAmount.add(amount).getAmount()
     }
     else {
-      let account = {
-        "amount": amount.getAmount(),
-        "accountNumber": accountNumber,
-        "plaidId": plaidId
-      }
+      //add account
+      let account = createAccount(amount, accountNumber, plaidId, getSourceAccount(chunk))
       employee["accounts"].push(account)
     }
   }
   else {
-    let account = {
-      "amount": amount.getAmount(),
-      "accountNumber": accountNumber,
-      "plaidId": plaidId
-    }
+    let account = createAccount(amount, accountNumber, plaidId, getSourceAccount(chunk))
     //add new employee
     payments[employeeId] = {
       "accounts": [account],
-      "branchId": branchId
+      "branchId": branchId,
+      "entityId": ""
     }
   }
   
@@ -73,6 +68,7 @@ const getDestAccount = (chunk) => {
 let getBranch = (chunk) => chunk['Employee']['DunkinBranch']
 let getEmployee = (chunk) => chunk['Employee']['DunkinId']
 let getAccount = (chunk) => chunk['Payee']['LoanAccountNumber']
+let getSourceAccount = (chunk) => chunk['Payor']['AccountNumber']
 let getAmount = (chunk) => {
   let amountString = chunk['Amount'].replace('$', '').replace('.', '')
   let amount = parseInt(amountString)
@@ -81,4 +77,17 @@ let getAmount = (chunk) => {
 let getPlaidId = (chunk) => chunk['Payee']['PlaidId']
 let getDinero = (amount) => Dinero({ amount: amount })
 
-module.exports = {initialize};
+let createAccount = (amount, accountNumber, plaidId, source) => {
+  let account = {
+    "amount": amount.getAmount(),
+    "accountNumber": accountNumber,
+    "accountId": "",
+    "plaidId": plaidId,
+    "srcAccountNumber": source
+  }
+  MerchantCache(plaidId)
+  return account
+}
+
+
+module.exports = {process};
