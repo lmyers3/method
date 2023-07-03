@@ -39,10 +39,7 @@ const execute = (req, res, next) => {
     xml.on('end', () => {
       promiseQueue
         .then( () => console.log("all operations completed"))
-        .then( () => console.log(JSON.stringify(payments)))
-        .then( () => console.log(JSON.stringify(sourceAccounts)))
         .then( () => processPayments(payments, merchants, sourceAccounts))
-        .then( () => console.log(JSON.stringify(sourceAccounts)))
     })
 
     xml.on('error', () => {

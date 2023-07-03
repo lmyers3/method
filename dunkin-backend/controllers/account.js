@@ -48,7 +48,6 @@ const linkCorpAccount = (entityId, account, sourceAccounts) => {
                 console.log('Response status:', error.response.status);
             }
         }
-        console.log(response.data)
         let acctId = response.data.data["id"]
         sourceAccounts[acctNum] = acctId
         resolve(acctId)
@@ -56,4 +55,31 @@ const linkCorpAccount = (entityId, account, sourceAccounts) => {
 
 }
 
-module.exports = {fetchCorpAccounts, linkCorpAccount}
+const linkLiability = (entityId, account, merchants) => {
+    let merchantId = merchants[account["plaidId"]]
+    let liability = {
+        "holder_id": entityId,
+        "liability": {
+            "mch_id": merchantId,
+            "number": account["accountNumber"]
+        }
+    } 
+
+    return new Promise( async(resolve) => {
+        let response
+        try {
+            response = await axios.post(`${host}accounts`, liability)
+        } catch (error) {
+            console.error('Error making the request', error)
+            if (error.response) {
+                console.log('Response data:', error.response.data);
+                console.log('Response status:', error.response.status);
+            }
+        }
+        let liabilityId = response.data.data["id"]
+        resolve(liabilityId)
+    })
+
+}
+
+module.exports = {fetchCorpAccounts, linkCorpAccount, linkLiability}
