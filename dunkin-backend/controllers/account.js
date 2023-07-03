@@ -26,10 +26,10 @@ const fetchCorpAccounts = (entityId, sourceAccounts) => {
     })
 }
 
-const linkCorpAccount = (entityId, chunk, sourceAccounts) => {
-    let routing = chunk["Payor"]["ABARouting"]
-    let acctNum = chunk["Payor"]["AccountNumber"]
-    let account = {
+const linkCorpAccount = (entityId, account, sourceAccounts) => {
+    let routing = account['srcRouting']
+    let acctNum = account['srcAccountNumber']
+    let accountLink = {
         "holder_id": entityId,
         "ach": {
             "routing": routing,
@@ -40,7 +40,7 @@ const linkCorpAccount = (entityId, chunk, sourceAccounts) => {
     return new Promise( async(resolve) => {
         let response
         try {
-            response = await axios.post(`${host}accounts`, account)
+            response = await axios.post(`${host}accounts`, accountLink)
         }catch (error) {
             console.error('Error making the request', error)
             if (error.response) {
@@ -48,12 +48,12 @@ const linkCorpAccount = (entityId, chunk, sourceAccounts) => {
                 console.log('Response status:', error.response.status);
             }
         }
-        let acctId = response.data["id"]
-        console.log(acctId)
+        console.log(response.data)
+        let acctId = response.data.data["id"]
         sourceAccounts[acctNum] = acctId
         resolve(acctId)
     })
 
 }
 
-module.exports = fetchCorpAccounts
+module.exports = {fetchCorpAccounts, linkCorpAccount}

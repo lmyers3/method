@@ -3,7 +3,7 @@ const fs = require('fs')
 const XmlStream = require('xml-stream')
 const stagePayment = require('./paymentstaging')
 const findMerchantId = require('./merchant')
-const fetchCorpAccounts = require('./account')
+const fetchCorpAccounts = require('./account').fetchCorpAccounts
 const processPayments = require('./paymentprocess')
 
 require('dotenv').config()
@@ -39,8 +39,10 @@ const execute = (req, res, next) => {
     xml.on('end', () => {
       promiseQueue
         .then( () => console.log("all operations completed"))
-        .then( () => console.log(JSON.stringify(merchants)))
+        .then( () => console.log(JSON.stringify(payments)))
+        .then( () => console.log(JSON.stringify(sourceAccounts)))
         .then( () => processPayments(payments, merchants, sourceAccounts))
+        .then( () => console.log(JSON.stringify(sourceAccounts)))
     })
 
     xml.on('error', () => {

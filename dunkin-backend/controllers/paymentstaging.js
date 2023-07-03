@@ -13,7 +13,6 @@ const initData = (chunk, payments) => {
     let accountNumber = getAccount(chunk)
     let srcAccount = getSourceAccount(chunk)
     let amount = getAmount(chunk)
-    let plaidId = getPlaidId(chunk)
   
     let employee = payments[employeeId]
     let account = {}
@@ -27,12 +26,12 @@ const initData = (chunk, payments) => {
       }
       else {
         //add account
-        account = createAccount(amount, accountNumber, plaidId, getSourceAccount(chunk))
+        account = createAccount(chunk)
         employee["accounts"].push(account)
       }
     }
     else {
-      account = createAccount(amount, accountNumber, plaidId, getSourceAccount(chunk))
+      account = createAccount(chunk)
       //add new employee
       payments[employeeId] = {
         "accounts": [account],
@@ -56,13 +55,19 @@ let getAmount = (chunk) => {
 let getPlaidId = (chunk) => chunk['Payee']['PlaidId']
 let getDinero = (amount) => Dinero({ amount: amount })
 
-let createAccount = (amount, accountNumber, plaidId, source) => {
+let createAccount = (chunk) => {
+    let accountNumber = getAccount(chunk)
+    let srcAccount = getSourceAccount(chunk)
+    let srcRouting = chunk['Payor']['ABARouting']
+    let amount = getAmount(chunk)
+    let plaidId = getPlaidId(chunk)
+
     let account = {
         "amount": amount.getAmount(),
-        "accountNumber": accountNumber,
-        "accountId": "",
         "plaidId": plaidId,
-        "srcAccountNumber": source
+        "accountNumber": accountNumber,
+        "srcAccountNumber": srcAccount,
+        "srcRouting": srcRouting
     }
     return account  
 }

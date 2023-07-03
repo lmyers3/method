@@ -1,4 +1,5 @@
 const createEmployee = require('./employee')
+const linkCorpAccount = require('./account').linkCorpAccount
 
 
 const processPayments = async(payments, merchants, sourceAccounts) => {
@@ -9,20 +10,47 @@ const processPayments = async(payments, merchants, sourceAccounts) => {
         let indvEntityId = await createEmployee(employee) 
         console.log("Processing entity for : "+indvEntityId)
         //process their payments
-        //processPaymentsForEmployee(employee["accounts"])
+        await processPaymentsForEmployee(indvEntityId, employee["accounts"], merchants, sourceAccounts)
     }
 
 }
 
-const processPaymentsForEmployee = async (accounts, merchants, sourceAccounts) => {
+const processPaymentsForEmployee = async (entityId, accounts, merchants, sourceAccounts) => {
+    console.log(`PROCESSING ${accounts.length}`)
+    accounts.forEach( async(ele) => {
+        let plaidId = ele["plaidId"]
+        if (merchants[plaidId] === "INVALID") {
+            console.log("INVALID PAYMENT")
+            return //dont process payment
+        } 
 
-    accounts.forEach( (ele) => {
-        if (merchants[ele["plaidId"]] === "INVALID") return
-        //get src acct
-        //link liabilbity
-        //make payment
+        await processSourceAccount(entityId, ele, sourceAccounts)
+
     })
 } 
+
+const processSourceAccount = async (entityId, account, sourceAccounts) => {
+    console.log("inside processSouurceAccount")
+    let srcAcctNum = account['srcAccountNumber']
+    let srcAcctId = sourceAccounts[srcAcctNum]
+    console.log(sourceAccounts[srcAcctNum])
+
+    if (sourceAccounts[srcAcctNum]) return srcAcctId
+
+    console.log("linking account")
+
+    srcAcctId = await linkCorpAccount(entityId, account, sourceAccounts)
+    console.log(`Created source acct with : ${srcAcctId}`)
+
+}
+
+const processLiability = () => {
+
+}
+
+const processPayment = () => {
+
+}
 
 
 module.exports = processPayments
