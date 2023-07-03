@@ -37,7 +37,8 @@ const initData = (chunk, payments) => {
       payments[employeeId] = {
         "accounts": [account],
         "branchId": branchId,
-        "entityId": ""
+        "firstName": chunk["Employee"]["FirstName"],
+        "lastName": chunk["Employee"]["LastName"]
       }
     }
     return account

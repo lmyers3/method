@@ -3,21 +3,32 @@ const fs = require('fs')
 const XmlStream = require('xml-stream')
 const stagePayment = require('./paymentstaging')
 const findMerchantId = require('./merchant')
+const fetchCorpAccounts = require('./account')
+const processPayments = require('./paymentprocess')
+
+require('dotenv').config()
 
 const filePath = path.join(__dirname,'..', '/uploads/')
 
 const payments = {}
 const merchants = {}
+const sourceAccounts = {}
+
+const corpId = process.env.CORP_ENTITY_ID
 
 let promiseQueue = Promise.resolve();
 
-const process = (req, res, next) => {
+const execute = (req, res, next) => {
     console.log(`Reading file from ${req.file.filename}`)
 
     const stream = fs.createReadStream(path.join(filePath, req.file.filename))
     stream.setEncoding('UTF8')
 
     const xml = new XmlStream(stream)
+
+    promiseQueue = promiseQueue
+    .then(() => fetchCorpAccounts(corpId, sourceAccounts))
+    .then(() => console.log(sourceAccounts))
 
     xml.on('endElement: row', async(chunk) => {
       promiseQueue = promiseQueue
@@ -28,8 +39,8 @@ const process = (req, res, next) => {
     xml.on('end', () => {
       promiseQueue
         .then( () => console.log("all operations completed"))
-        // .then( () => console.log(JSON.stringify(payments)))
         .then( () => console.log(JSON.stringify(merchants)))
+        .then( () => processPayments(payments, merchants, sourceAccounts))
     })
 
     xml.on('error', () => {
@@ -42,4 +53,4 @@ const process = (req, res, next) => {
 let getPlaidId = (chunk) => chunk['Payee']['PlaidId']
 
 
-module.exports = {process};
+module.exports = {execute};
