@@ -20,11 +20,13 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage })
 
 router.post('/payment-instruction', [upload.single("file"), payInstrController.execute], (req, res) => {
-  let outboundPath = path.join(__dirname,'..','outbound', req["outboundFile"])  
+  //let outboundPath = path.join(__dirname,'..','outbound', req["outboundFile"])  
 
-  const readStream = fs.createReadStream(outboundPath)
+  res.json(req["outbound"])
 
-  readStream.pipe(res)
+  // const readStream = fs.createReadStream(outboundPath)
+
+  // readStream.pipe(res)
 
 })
 

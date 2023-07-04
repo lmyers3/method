@@ -33,7 +33,7 @@ const createEmployee = (employee) => {
                 console.log('Response status:', error.response.status);
             }
         }
-        let entityId = response.data.data["id"]
+        let entityId = response?.data?.data["id"]
         console.log(`entityId is : ${entityId}`)
         resolve(entityId)
     })

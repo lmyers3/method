@@ -16,6 +16,7 @@ const header = [
   {id: 'destAccountNumber', title: 'destAccountNumber'},
   {id: 'destAccountId', title: 'destination'},
   {id: 'plaidId', title: 'plaidId'},
+  {id: 'status', title: 'status'},
   {id: 'amount', title: 'amount'},
 ]
 

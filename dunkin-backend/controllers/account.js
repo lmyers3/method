@@ -13,7 +13,7 @@ const fetchCorpAccounts = (entityId, sourceAccounts) => {
         try {
             await sharedResource.waitForReady()
             response = await axios.get(`${host}accounts?holder_id=${entityId}`)
-            let accounts = response.data.data
+            let accounts = response?.data?.data
             accounts.forEach(ele => {
                 sourceAccounts[ele["ach"]["number"]]=ele["id"]
             })
@@ -51,7 +51,7 @@ const linkCorpAccount = (entityId, account, sourceAccounts) => {
                 console.log('Response status:', error.response.status);
             }
         }
-        let acctId = response.data.data["id"]
+        let acctId = response?.data?.data["id"]
         sourceAccounts[acctNum] = acctId
         resolve(acctId)
     })
@@ -74,13 +74,16 @@ const linkLiability = (entityId, account, merchants) => {
             await sharedResource.waitForReady()
             response = await axios.post(`${host}accounts`, liability)
         } catch (error) {
+            if (retryCount === 0) {
+                throw new Error('Maximum retries exceeded');
+            }
             console.error('Error making the request', error)
             if (error.response) {
                 console.log('Response data:', error.response.data);
                 console.log('Response status:', error.response.status);
             }
         }
-        let liabilityId = response.data.data["id"]
+        let liabilityId = response?.data?.data["id"]
         resolve(liabilityId)
     })
 

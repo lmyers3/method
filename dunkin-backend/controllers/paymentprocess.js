@@ -1,6 +1,6 @@
 const createEmployee = require('./employee')
 const {linkCorpAccount, linkLiability} = require('./account')
-const {writeDataToCSV, generateRandomString, getDateString} = require('../util/StagingFile')
+const {writeDataToCSV} = require('../util/StagingFile')
 const maskAccountNumber = require('../util/AccountMask')
 const path = require('path')
 
@@ -11,9 +11,9 @@ const corpId = process.env.CORP_ENTITY_ID
 var filename
 var date
 
-const processPayments = async (payments, merchants, sourceAccounts) => {
-    filename = generateRandomString()+".csv"
-    date = getDateString()
+const processPayments = async (payments, merchants, sourceAccounts, file) => {
+    filename = file["filename"]
+    date = file["date"]
 
     // Transform the payments object to an array of promises
     const promises = Object.keys(payments).map(async empId => {
@@ -83,6 +83,7 @@ const processPayment = async () => {
 }
 
 const createPaymentObject = (employee, account) => {
+    let status = account["source"] && account["destination"] ? "success" : "failure"
     return {
         "employeeId": employee["employeeId"],
         "dunkinBranchId": employee["branchId"],
@@ -95,6 +96,7 @@ const createPaymentObject = (employee, account) => {
         "destAccountNumber": maskAccountNumber(account["accountNumber"]),
         "destAccountId": account["destination"],
         "plaidId": account["plaidId"],
+        "status": status,
         "amount": account["amount"]
     }
 }
