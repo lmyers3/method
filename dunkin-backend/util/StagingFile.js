@@ -1,19 +1,45 @@
 const fs = require('fs').promises
 const path = require('path')
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
-const basePath = path.join(__dirname,'..', '/data/')
+const basePath = path.join(__dirname,'..', '/outbound/')
 
-async function writeJsonToFile(filename, data) {
-    let date = getDateString()
-    let filePath = path.join(basePath, date, filename)
-    try {
-      let row = Object.values(data).join(',')+'\n'
-      await fs.mkdir(path.join(basePath, date), { recursive: true})
-      await fs.appendFile(filePath, row);
-      console.log(`Data written to file ${filename} successfully.`);
-    } catch (err) {
-      console.error(`Error writing file: ${err}`);
-    }
+const header = [
+  {id: 'employeeId', title: 'employeeId'},
+  {id: 'dunkinBranchId', title: 'dunkinBranchId'},
+  {id: 'dunkinStoreId', title: 'dunkinStoreId'},
+  {id: 'firstName', title: 'firstName'},
+  {id: 'lastName', title: 'lastName'},
+  {id: 'routing', title: 'routing'},
+  {id: 'srcAccountNumber', title: 'srcAccountNumber'},
+  {id: 'srcAccountId', title: 'srcAccountId'},
+  {id: 'destAccountNumber', title: 'destAccountNumber'},
+  {id: 'destAccountId', title: 'destination'},
+  {id: 'plaidId', title: 'plaidId'},
+  {id: 'amount', title: 'amount'},
+]
+
+
+async function writeDataToCSV(date, filename, data) {
+  let filePath = path.join(basePath, date, filename)
+  await fs.mkdir(path.join(basePath, date), { recursive: true})
+
+  await checkFileAndWriteHeader(filePath, header)
+
+  const csvWriter = createCsvWriter({
+    path: filePath,
+    header: header,
+    append: true
+  });
+
+  console.log(data)
+
+  await csvWriter
+    .writeRecords([data])
+
+    console.log(`Data written to file ${filename} successfully.`);
+  
+  return true
 }
 
 const getDateString = () => {
@@ -38,6 +64,23 @@ function generateRandomString() {
     
     return result;
 }
-  
 
-module.exports = {writeJsonToFile, generateRandomString}
+async function checkFileAndWriteHeader(filePath, header) {
+  try {
+    await fs.access(filePath);
+    // The file exists, do nothing
+  } catch {
+    // The file does not exist, create it with headers
+    const csvWriter = createHeaderWriter(filePath, header);
+    await csvWriter.writeRecords([{}]); // Write an empty record to create the file
+  }
+}
+
+function createHeaderWriter(filePath) {
+  return createCsvWriter({
+    path: filePath,
+    header: header
+  });
+}
+
+module.exports = {writeDataToCSV, generateRandomString, getDateString}

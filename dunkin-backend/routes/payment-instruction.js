@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const multer = require('multer')
 const path = require('path')
+const fs = require('fs');
 const payInstrController = require('../controllers/paymentinstruction')
 
 const filePath = path.join(__dirname,'..', '/uploads/')
@@ -19,8 +20,12 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage })
 
 router.post('/payment-instruction', [upload.single("file"), payInstrController.execute], (req, res) => {
+  let outboundPath = path.join(__dirname,'..','outbound', req["outboundFile"])  
 
-    res.json({status: "files recieved"})
+  const readStream = fs.createReadStream(outboundPath)
+
+  readStream.pipe(res)
+
 })
 
 module.exports = router;

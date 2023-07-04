@@ -37,16 +37,22 @@ const execute = (req, res, next) => {
     })
 
     xml.on('end', () => {
-      promiseQueue
+      promiseQueue = promiseQueue
         .then( () => console.log("all operations completed"))
         .then( () => processPayments(payments, merchants, sourceAccounts))
+        .then( (filename) => {
+          console.log(`${filename} was successfully generated`)
+          req["outboundFile"] = filename
+          next()
+        })
     })
 
     xml.on('error', () => {
       console.log("ERROR")
+      next()
     })
 
-    next()
+
 }
 
 let getPlaidId = (chunk) => chunk['Payee']['PlaidId']
