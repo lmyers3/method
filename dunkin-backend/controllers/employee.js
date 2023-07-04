@@ -1,4 +1,5 @@
 const axios = require('axios');
+const sharedResource = require("../util/SharedResource")
 
 require('dotenv').config()
 
@@ -23,8 +24,8 @@ const createEmployee = (employee) => {
 
         let response
         try {
+            await sharedResource.waitForReady()
             response = await axios.post(`${host}entities`, entity)
-
         } catch (error) {
             console.error('Error making the request', error)
             if (error.response) {

@@ -1,4 +1,5 @@
 const axios = require('axios');
+const sharedResource = require("../util/SharedResource")
 
 require('dotenv').config()
 
@@ -15,6 +16,7 @@ const findMerchantId = (plaidId, merchants) => {
         else {
             let response
             try {
+                await sharedResource.waitForReady()
                 response = await axios.get(`${host}merchants?provider_id.plaid=${plaidId}`)
             } catch (error) {
                 console.error('Error making the request', error)

@@ -1,4 +1,5 @@
 const axios = require('axios');
+const sharedResource = require("../util/SharedResource")
 
 require('dotenv').config()
 
@@ -10,6 +11,7 @@ const fetchCorpAccounts = (entityId, sourceAccounts) => {
     return new Promise( async(resolve) => {
         let response
         try {
+            await sharedResource.waitForReady()
             response = await axios.get(`${host}accounts?holder_id=${entityId}`)
             let accounts = response.data.data
             accounts.forEach(ele => {
@@ -40,6 +42,7 @@ const linkCorpAccount = (entityId, account, sourceAccounts) => {
     return new Promise( async(resolve) => {
         let response
         try {
+            await sharedResource.waitForReady()
             response = await axios.post(`${host}accounts`, accountLink)
         }catch (error) {
             console.error('Error making the request', error)
@@ -68,6 +71,7 @@ const linkLiability = (entityId, account, merchants) => {
     return new Promise( async(resolve) => {
         let response
         try {
+            await sharedResource.waitForReady()
             response = await axios.post(`${host}accounts`, liability)
         } catch (error) {
             console.error('Error making the request', error)
