@@ -96,7 +96,7 @@ const createPaymentObject = (employee, account) => {
         "destAccountNumber": maskAccountNumber(account["accountNumber"]),
         "destAccountId": account["destination"],
         "plaidId": account["plaidId"],
-        "status": status,
+        "stagingStatus": status,
         "amount": account["amount"]
     }
 }
