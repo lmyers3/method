@@ -39,6 +39,9 @@ const processPaymentsForEmployee = async (employee, merchants, sourceAccounts) =
         let plaidId = ele["plaidId"]
         if (merchants[plaidId] === "INVALID") {
             console.log("INVALID PAYMENT")
+            payment = createPaymentObject(employee, ele)
+            payment["plaidId"] = "INVALID"
+            await writeDataToCSV(date, filename, payment)
             return //dont process payment
         } else {
 
