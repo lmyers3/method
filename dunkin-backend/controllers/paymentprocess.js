@@ -1,9 +1,13 @@
 const createEmployee = require('./employee')
 const {linkCorpAccount, linkLiability} = require('./account')
+const {writeJsonToFile, generateRandomString} = require('../util/StagingFile')
+const maskAccountNumber = require('../util/AccountMask')
 
 require('dotenv').config()
 
 const corpId = process.env.CORP_ENTITY_ID
+
+const filename = generateRandomString()+".csv"
 
 const processPayments = async(payments, merchants, sourceAccounts) => {
 
@@ -11,15 +15,17 @@ const processPayments = async(payments, merchants, sourceAccounts) => {
         //create individual entity
         const employee = payments[empId]
         let indvEntityId = await createEmployee(employee) 
+        employee["entityId"] = indvEntityId
         console.log("Processing entity for : "+indvEntityId)
-        //process their payments
-        await processPaymentsForEmployee(indvEntityId, employee["accounts"], merchants, sourceAccounts)
+        let payment = await processPaymentsForEmployee(employee, merchants, sourceAccounts)
     }
 
 }
 
-const processPaymentsForEmployee = (entityId, accounts, merchants, sourceAccounts) => {
+const processPaymentsForEmployee = (employee, merchants, sourceAccounts) => {
+    let payment
     return new Promise( async resolve => {
+        let accounts = employee["accounts"]
         console.log(`PROCESSING ${accounts.length}`)
         accounts.forEach( async(ele) => {
             let plaidId = ele["plaidId"]
@@ -28,20 +34,18 @@ const processPaymentsForEmployee = (entityId, accounts, merchants, sourceAccount
                 return //dont process payment
             } else {
 
-                let srcAcctId = await processSourceAccount(corpId, ele, sourceAccounts)//SWITCH TO CORPID
-                let liabilityId = await processLiability(entityId, ele, merchants)
-        
-                console.log(`
-                    Entity ID: ${entityId}, 
-                    Corp ID: ${corpId}, 
-                    Dest Account: ${liabilityId}, 
-                    Source Acount ${srcAcctId}, 
-                    Amount: ${ele["amount"]}
-                `)
+                let srcAcctId = await processSourceAccount(corpId, ele, sourceAccounts)
+                let liabilityId = await processLiability(employee["entityId"], ele, merchants)
 
+                ele["source"] = srcAcctId
+                ele["destination"] = liabilityId
+
+                payment = createPaymentObject(employee, ele)
+                await writeJsonToFile(filename, payment)
+                console.log(payment)
             }
         })
-        resolve(true)
+        resolve(payment)
     })
 } 
 
@@ -63,6 +67,23 @@ const processLiability = async (entityId, account, merchants) => {
 
 const processPayment = async () => {
 
+}
+
+const createPaymentObject = (employee, account) => {
+    return {
+        "employeeId": employee["employeeId"],
+        "dunkinBranchId": employee["branchId"],
+        "dunkinStoreId": account["storeId"],
+        "firstName": employee["firstName"],
+        "lastName": employee["lastName"],
+        "routing": account["srcRouting"],
+        "srcAccountNumber": maskAccountNumber(account["srcAccountNumber"]),
+        "srcAccountId": account["source"],
+        "destAccountNumber": maskAccountNumber(account["accountNumber"]),
+        "destAccountId": account["destination"],
+        "plaidId": account["plaidId"],
+        "amount": account["amount"]
+    }
 }
 
 

@@ -35,6 +35,7 @@ const initData = (chunk, payments) => {
       //add new employee
       payments[employeeId] = {
         "accounts": [account],
+        "employeeId": employeeId,
         "branchId": branchId,
         "firstName": chunk["Employee"]["FirstName"],
         "lastName": chunk["Employee"]["LastName"]
@@ -67,7 +68,8 @@ let createAccount = (chunk) => {
         "plaidId": plaidId,
         "accountNumber": accountNumber,
         "srcAccountNumber": srcAccount,
-        "srcRouting": srcRouting
+        "srcRouting": srcRouting,
+        "storeId": chunk["Payor"]["DunkinId"]
     }
     return account  
 }
