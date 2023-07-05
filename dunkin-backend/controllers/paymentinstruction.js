@@ -5,7 +5,7 @@ const stagePayment = require('./paymentstaging')
 const findMerchantId = require('./merchant')
 const fetchCorpAccounts = require('./account').fetchCorpAccounts
 const processPayments = require('./paymentprocess')
-const {generateRandomString, getDateString} = require('../util/StagingFile')
+const {generateRandomString, getDateString, renameFile} = require('../util/StagingFile')
 
 require('dotenv').config()
 
@@ -46,6 +46,7 @@ const execute = (req, res, next) => {
         .then( () => processPayments(payments, merchants, sourceAccounts, stagingFile))
         .then( (filename) => {
           console.log(`${filename} was successfully generated`)
+          renameFile(filename)
           next()
         })
     })

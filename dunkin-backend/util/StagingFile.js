@@ -84,4 +84,19 @@ function createHeaderWriter(filePath) {
   });
 }
 
-module.exports = {writeDataToCSV, generateRandomString, getDateString}
+async function renameFile(filePath) {
+  const dirname = path.dirname(filePath);
+  const extname = path.extname(filePath);
+  const basename = path.basename(filePath, extname);
+  const newFilePath = path.join(basePath, dirname, `${basename}.done${extname}`);
+
+  await fs.rename(path.join(basePath, filePath), newFilePath, (err) => {
+    if (err) {
+      console.error('An error occurred:', err);
+    } else {
+      console.log(`File was renamed to ${newFilePath}`);
+    }
+  });
+}
+
+module.exports = {writeDataToCSV, generateRandomString, getDateString, renameFile}

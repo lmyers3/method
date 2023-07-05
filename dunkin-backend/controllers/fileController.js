@@ -31,7 +31,10 @@ const findOutboundFilesHelper = async (subdir) => {
 
           let status
           if (subdir == 'staging') {
-            status = 'staged'
+            status = 'loaded'
+            if(name.includes('.done')) {
+              status = 'staged'
+            }
           }
           else if (subdir == 'processed') {
             status = 'processed'
