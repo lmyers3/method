@@ -16,7 +16,7 @@ const corpId = process.env.CORP_ENTITY_ID
 let promiseQueue = Promise.resolve();
 
 const execute = (req, res, next) => {
-    const file = makeFileName()
+    const stagingFile = makeFileName()
 
     const payments = {}
     const merchants = {}
@@ -35,7 +35,7 @@ const execute = (req, res, next) => {
 
     xml.on('endElement: row', async(chunk) => {
       promiseQueue = promiseQueue
-        .then(() => req["outbound"]= file)
+        .then(() => req["outbound"]= stagingFile)
         .then(() => next())
         .then(() => stagePayment(chunk, payments))
         .then(() => findMerchantId(getPlaidId(chunk), merchants))
@@ -43,7 +43,7 @@ const execute = (req, res, next) => {
 
     xml.on('end', () => {
       promiseQueue = promiseQueue
-        .then( () => processPayments(payments, merchants, sourceAccounts, file))
+        .then( () => processPayments(payments, merchants, sourceAccounts, stagingFile))
         .then( (filename) => {
           console.log(`${filename} was successfully generated`)
           next()

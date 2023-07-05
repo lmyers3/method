@@ -2,7 +2,7 @@ const fs = require('fs').promises
 const path = require('path')
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
-const basePath = path.join(__dirname,'..', '/outbound/')
+const basePath = path.join(__dirname,'..', '/outbound/staging')
 
 const header = [
   {id: 'employeeId', title: 'employeeId'},
