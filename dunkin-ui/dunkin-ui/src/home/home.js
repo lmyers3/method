@@ -4,6 +4,9 @@ import axios from "axios";
 import './home.css'
 
 
+import FileUpload from './upload';
+
+
 const Home = () => {
     console.log(process.env.REACT_APP_API_HOST)
     const [data, setData] = useState([]);
@@ -23,19 +26,19 @@ const Home = () => {
       fetchData();
     }, []);
 
+    const handleUpload = (file) => {
+      setData(prevData => [file, ...prevData])
+      console.log(data)
+    } 
+
 
     return (
         <div>
 
             <div className="table-container">
+                <FileUpload className="upload-btn" handleFileUpload={handleUpload}></FileUpload>
                 <FileTable rows={data}></FileTable>
-                <div>
-      {data.length > 0 ? (
-        data.map((item, index) => <div key={index}>{item.data}</div>)
-      ) : (
-        <p>No data to display</p>
-      )}
-    </div>
+
             </div>
         </div>
 
