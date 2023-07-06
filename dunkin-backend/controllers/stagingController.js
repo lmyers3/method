@@ -9,7 +9,8 @@ const parseCsvFile = (req, res, next) => {
     let summary = {
         "totalPayments": 0,
         "totalSuccess": 0,
-        "totalRejected": 0
+        "totalRejected": 0,
+        "payments": []
     }
 
     fs.createReadStream(filePath)
@@ -20,6 +21,8 @@ const parseCsvFile = (req, res, next) => {
             summary["totalPayments"]++;
             if (row["stagingStatus"] == "rejected") summary["totalRejected"]++
             if (row["stagingStatus"] == "success") summary["totalSuccess"]++
+
+            if (index <= 20) summary["payments"].push(row)
             
             console.log(row); 
         })
