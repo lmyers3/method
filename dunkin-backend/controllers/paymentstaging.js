@@ -1,77 +1,100 @@
-const Dinero = require('dinero.js')
+const createEmployee = require('./employee')
+const {linkCorpAccount, linkLiability} = require('./account')
+const {writeDataToCSV} = require('../util/StagingFile')
+const maskAccountNumber = require('../util/AccountMask')
+const path = require('path')
 
-const stagePayment = (chunk, payments) => {
-  return new Promise( resolve => {
-    let account = initData(chunk, payments)
-    resolve(account)
-  })
-}
+require('dotenv').config()
 
-const initData = (chunk, payments) => {
-    let branchId = getBranch(chunk)
-    let employeeId = getEmployee(chunk)
-    let accountNumber = getAccount(chunk)
-    let srcAccount = getSourceAccount(chunk)
-    let amount = getAmount(chunk)
+const corpId = process.env.CORP_ENTITY_ID
+
+var filename
+var date
+
+const processPayments = async (payments, merchants, sourceAccounts, file) => {
+    filename = file["filename"]
+    date = file["date"]
+
+    // Transform the payments object to an array of promises
+    const promises = Object.keys(payments).map(async empId => {
+      const employee = payments[empId];
+      const indvEntityId = await createEmployee(employee);
+      employee["entityId"] = indvEntityId;
+      console.log("Processing entity for : " + indvEntityId);
+      const payment = await processPaymentsForEmployee(employee, merchants, sourceAccounts);
+    });
   
-    let employee = payments[employeeId]
-    let account = {}
+    // Wait for all promises to resolve
+    await Promise.all(promises);
   
-    if (employee) {
-      account = employee['accounts'].find(ele => ele.accountNumber === accountNumber && ele.srcAccountNumber === srcAccount)
-      if (account) {
-        //aggregate payment
-        let origAmount = getDinero(account.amount)
-        account.amount = origAmount.add(amount).getAmount()
-      }
-      else {
-        //add account
-        account = createAccount(chunk)
-        employee["accounts"].push(account)
-      }
-    }
-    else {
-      account = createAccount(chunk)
-      //add new employee
-      payments[employeeId] = {
-        "accounts": [account],
-        "employeeId": employeeId,
-        "branchId": branchId,
-        "firstName": chunk["Employee"]["FirstName"],
-        "lastName": chunk["Employee"]["LastName"]
-      }
-    }
-    return account
+    return path.join(date, filename);
+  };
+  
+
+const processPaymentsForEmployee = async (employee, merchants, sourceAccounts) => {
+    let payment
+    let accounts = employee["accounts"]
+    console.log(`PROCESSING ${accounts.length}`)
+    let promises = accounts.map( async ele => {
+        let plaidId = ele["plaidId"]
+        if (merchants[plaidId] === "INVALID") {
+            console.log("INVALID PAYMENT")
+            payment = createPaymentObject(employee, ele)
+            payment["plaidId"] = "INVALID"
+            await writeDataToCSV(date, filename, payment)
+            return //dont process payment
+        } else {
+
+            let srcAcctId = await processSourceAccount(corpId, ele, sourceAccounts)
+            let liabilityId = await processLiability(employee["entityId"], ele, merchants)
+
+            ele["source"] = srcAcctId
+            ele["destination"] = liabilityId
+
+            payment = createPaymentObject(employee, ele)
+            let wrote = await writeDataToCSV(date, filename, payment)
+        }
+    })
+
+    await Promise.all(promises)
+
+    return payment
+} 
+
+const processSourceAccount = async (entityId, account, sourceAccounts) => {
+    let srcAcctNum = account['srcAccountNumber']
+    let srcAcctId = sourceAccounts[srcAcctNum]
+
+    if (sourceAccounts[srcAcctNum]) return srcAcctId
+
+    srcAcctId = await linkCorpAccount(entityId, account, sourceAccounts)
+    console.log(`Created source acct with : ${srcAcctId}`)
+    return srcAcctId
+}   
+
+const processLiability = async (entityId, account, merchants) => {
+    let liabilityId = await linkLiability(entityId, account, merchants)
+    return liabilityId
 }
 
-let getBranch = (chunk) => chunk['Employee']['DunkinBranch']
-let getEmployee = (chunk) => chunk['Employee']['DunkinId']
-let getAccount = (chunk) => chunk['Payee']['LoanAccountNumber']
-let getSourceAccount = (chunk) => chunk['Payor']['AccountNumber']
-let getAmount = (chunk) => {
-    let amountString = chunk['Amount'].replace('$', '').replace('.', '')
-    let amount = parseInt(amountString)
-    return getDinero(amount)
-}
-let getPlaidId = (chunk) => chunk['Payee']['PlaidId']
-let getDinero = (amount) => Dinero({ amount: amount })
-
-let createAccount = (chunk) => {
-    let accountNumber = getAccount(chunk)
-    let srcAccount = getSourceAccount(chunk)
-    let srcRouting = chunk['Payor']['ABARouting']
-    let amount = getAmount(chunk)
-    let plaidId = getPlaidId(chunk)
-
-    let account = {
-        "amount": amount.getAmount(),
-        "plaidId": plaidId,
-        "accountNumber": accountNumber,
-        "srcAccountNumber": srcAccount,
-        "srcRouting": srcRouting,
-        "storeId": chunk["Payor"]["DunkinId"]
+const createPaymentObject = (employee, account) => {
+    let status = account["source"] && account["destination"] ? "success" : "rejected"
+    return {
+        "employeeId": employee["employeeId"],
+        "dunkinBranchId": employee["branchId"],
+        "dunkinStoreId": account["storeId"],
+        "firstName": employee["firstName"],
+        "lastName": employee["lastName"],
+        "routing": account["srcRouting"],
+        "srcAccountNumber": maskAccountNumber(account["srcAccountNumber"]),
+        "srcAccountId": account["source"],
+        "destAccountNumber": maskAccountNumber(account["accountNumber"]),
+        "destAccountId": account["destination"],
+        "plaidId": account["plaidId"],
+        "stagingStatus": status,
+        "amount": account["amount"]
     }
-    return account  
 }
 
-module.exports = stagePayment
+
+module.exports = processPayments

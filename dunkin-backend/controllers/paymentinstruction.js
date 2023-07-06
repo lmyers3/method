@@ -1,10 +1,10 @@
 const path = require('path')
 const fs = require('fs')
 const XmlStream = require('xml-stream')
-const stagePayment = require('./paymentstaging')
+const stagePayment = require('./paymentLoad')
 const findMerchantId = require('./merchant')
 const fetchCorpAccounts = require('./account').fetchCorpAccounts
-const processPayments = require('./paymentprocess')
+const processPayments = require('./paymentStaging')
 const {generateRandomString, getDateString, renameFile} = require('../util/StagingFile')
 
 require('dotenv').config()
