@@ -1,5 +1,6 @@
+import React, { useState, useEffect } from 'react';
+import axios from "axios";
 import { Container } from "@mui/material";
-import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -11,6 +12,23 @@ import Typography from '@mui/material/Typography';
 
 
 export default function File(props) {
+    const [data, setData] = useState([]);
+
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const response = await axios.get(`${process.env.REACT_APP_API_HOST}staging?date=${props.file["date"]}&fileName=${props.file["fileName"]}`);
+          const data = response.data
+          setData(data);
+        } catch (error) {
+          console.error('Failed to fetch data:', error);
+        }
+      };
+  
+      fetchData();
+    }, [props.file]);
+
     return (
         <div>
             <Container maxWidth="sm">
@@ -24,9 +42,9 @@ export default function File(props) {
                             {props.file["date"]}
                         </Typography>
                         <Typography variant="body2">
-                        well meaning and kindly.
+                        Total Payments Staged: {data["totalSuccess"]}
                         <br />
-                        {'"a benevolent smile"'}
+                        Total Payments Rejected: {data["totalRejected"]}
                         </Typography>
                     </CardContent>
                     <CardActions>
