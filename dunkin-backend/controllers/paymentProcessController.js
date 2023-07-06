@@ -2,7 +2,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const path = require('path')
 const makePayment = require('./payment')
-const {writePaymentToCSV, getDateString, renameFile, deleteFile} = require('../util/ProcessPaymentFile')
+const {softDelFile, writePaymentToCSV, getDateString, renameFile, deleteFile} = require('../util/ProcessPaymentFile')
 
 
 const processPayments = (req, res, next) => {
@@ -62,6 +62,7 @@ const processPayments = (req, res, next) => {
                 "fileName": name,
                 "date": newDate
             }
+            await softDelFile(req.query["date"], req.query["fileName"])
             next()
         })
         .on('error', (err) => {

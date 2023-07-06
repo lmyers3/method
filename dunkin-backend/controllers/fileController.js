@@ -30,6 +30,7 @@ const findOutboundFilesHelper = async (subdir) => {
         fileNames.forEach( name => {
 
           let status
+          if (name.includes(".del")) return;
           if (subdir == 'staging') {
             status = 'loaded'
             if(name.includes('.done')) {

@@ -78,7 +78,7 @@ const getDateString = () => {
 async function renameFile(date, filename) {
   const dirname = date;
   const extname = path.extname(filename);
-  const basename = path.basename(filename, extname);
+  const basename = path.basename(filename, extname)
   const newFilePath = path.join(basePath, dirname, `${basename}.done${extname}`);
 
   await fs.rename(path.join(basePath, date, filename), newFilePath, (err) => {
@@ -90,6 +90,23 @@ async function renameFile(date, filename) {
   });
   return `${basename}.done${extname}`
 }
+
+
+async function softDelFile(date, filename) {
+    const dirname = date;
+    const extname = path.extname(filename);
+    const basename = path.basename(filename, extname);
+    const newFilePath = path.join(__dirname,'..', '/outbound/staging', dirname, `${basename}.del${extname}`);
+  
+    await fs.rename(path.join(__dirname,'..', '/outbound/staging', date, filename), newFilePath, (err) => {
+      if (err) {
+        console.error('An error occurred:', err);
+      } else {
+        console.log(`File was renamed to ${newFilePath}`);
+      }
+    });
+    return `${basename}.done${extname}`
+  }
 
 function deleteFile(filePath) {
     console.log("deleting...")
@@ -109,4 +126,4 @@ function deleteFile(filePath) {
 
   
 
-module.exports = {writePaymentToCSV, deleteFile, getDateString, renameFile}
+module.exports = {writePaymentToCSV, deleteFile, softDelFile, getDateString, renameFile}
