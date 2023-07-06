@@ -28,3 +28,5 @@ const makePayment = (source, destination, amount) => {
         resolve(response.data)
     }) 
 }
+
+module.exports= makePayment

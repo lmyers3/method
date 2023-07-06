@@ -4,12 +4,13 @@ var cors = require('cors');
 const payInstrRoutes = require('./routes/payment-instruction')
 const filesRouter = require('./routes/files')
 const stagingRouter = require('./routes/staging')
+const processPaymentsRouter = require('./routes/processPayments')
 
 global.__basedir = __dirname;
 
 app.use(cors())
 
-app.use("/", [payInstrRoutes, filesRouter, stagingRouter])
+app.use("/", [payInstrRoutes, filesRouter, stagingRouter, processPaymentsRouter])
 
 
 app.listen(5000, () => {
