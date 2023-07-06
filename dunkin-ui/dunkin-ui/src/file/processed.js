@@ -16,7 +16,7 @@ export default function ProcessedContent(props) {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_HOST}staging?date=${props.file["date"]}&fileName=${props.file["fileName"]}`);
+          const response = await axios.get(`${process.env.REACT_APP_API_HOST}staging?date=${props.file["date"]}&fileName=${props.file["fileName"]}&phase=processed`);
           const data = response.data
           setData(data);
         } catch (error) {

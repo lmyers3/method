@@ -16,9 +16,11 @@ export default function StagedContent(props) {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_HOST}staging?date=${props.file["date"]}&fileName=${props.file["fileName"]}`);
+          const response = await axios.get(
+            `${process.env.REACT_APP_API_HOST}staging?date=${props.file["date"]}&fileName=${props.file["fileName"]}&phase=staging`);
           const data = response.data
           setData(data);
+          console.log(data)
         } catch (error) {
           console.error('Failed to fetch data:', error);
         }

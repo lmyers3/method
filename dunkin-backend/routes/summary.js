@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router()
-const parseCsvFile = require('../controllers/stagingController')
+const parseCsvFile = require('../controllers/summaryController')
 
 
 router.get('/staging', parseCsvFile, (req, res) => {

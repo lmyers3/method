@@ -3,14 +3,14 @@ const app = express()
 var cors = require('cors');
 const payInstrRoutes = require('./routes/payment-instruction')
 const filesRouter = require('./routes/files')
-const stagingRouter = require('./routes/staging')
+const summaryRouter = require('./routes/summary')
 const processPaymentsRouter = require('./routes/processPayments')
 
 global.__basedir = __dirname;
 
 app.use(cors())
 
-app.use("/", [payInstrRoutes, filesRouter, stagingRouter, processPaymentsRouter])
+app.use("/", [payInstrRoutes, filesRouter, summaryRouter, processPaymentsRouter])
 
 
 app.listen(5000, () => {

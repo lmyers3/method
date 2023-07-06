@@ -3,7 +3,7 @@ const csv = require('csv-parser');
 const path = require('path')
 
 const parseCsvFile = (req, res, next) => {
-    let filePath = path.join(__dirname, '..', 'outbound', 'staging', req.query["date"], req.query["fileName"])
+    let filePath = path.join(__dirname, '..', 'outbound', req.query["phase"], req.query["date"], req.query["fileName"])
     let index = 0;
 
     let summary = {
@@ -19,8 +19,11 @@ const parseCsvFile = (req, res, next) => {
             index++;
             if (index == 1) return
             summary["totalPayments"]++;
-            if (row["stagingStatus"] == "rejected") summary["totalRejected"]++
-            if (row["stagingStatus"] == "success") summary["totalSuccess"]++
+
+            let status = req.query["phase"] === "staging" ? row["stagingStatus"] : row["paymentStatus"]
+
+            if (status == "rejected") summary["totalRejected"]++
+            if (status == "success") summary["totalSuccess"]++
 
             if (index <= 20) summary["payments"].push(row)
             
