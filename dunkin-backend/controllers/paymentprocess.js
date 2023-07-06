@@ -53,7 +53,6 @@ const processPaymentsForEmployee = async (employee, merchants, sourceAccounts) =
 
             payment = createPaymentObject(employee, ele)
             let wrote = await writeDataToCSV(date, filename, payment)
-            console.log("wrote data!!!"+ wrote)
         }
     })
 
@@ -83,7 +82,7 @@ const processPayment = async () => {
 }
 
 const createPaymentObject = (employee, account) => {
-    let status = account["source"] && account["destination"] ? "success" : "failure"
+    let status = account["source"] && account["destination"] ? "success" : "rejected"
     return {
         "employeeId": employee["employeeId"],
         "dunkinBranchId": employee["branchId"],
