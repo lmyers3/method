@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from "axios";
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import CancelIcon from '@mui/icons-material/Cancel';
+import { Box } from '@mui/material';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -45,7 +45,29 @@ export default function ProcessedContent(props) {
             <br />
             Total Payments Rejected: {data["totalRejected"]}
             </Typography>
+
+            <Typography variant="h5" component="div" sx={{ mb: 1.5, mt: 1.5 }}>
+                Download Reports
+            </Typography>
+
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                <CardActions >
+
+                    <Stack spacing={2} direction="column">
+                        <Button variant="outlined">
+                            By Branch
+                        </Button>
+                        <Button variant="outlined">
+                            By Source Account
+                        </Button>
+                        <Button variant="outlined">
+                            All Payments
+                        </Button>
+                    </Stack>
+                </CardActions>
+            </Box>
         </CardContent>
+        
     </div>    
     )
 
