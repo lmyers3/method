@@ -3,13 +3,17 @@ import FileTable from "./filetable";
 import axios from "axios";
 import './home.css'
 
+import File from '../file/file';
+
 
 import FileUpload from './upload';
 
 
+
+
 const Home = () => {
-    console.log(process.env.REACT_APP_API_HOST)
     const [data, setData] = useState([]);
+    const [item, setItem] = useState(null)
 
     useEffect(() => {
       const fetchData = async () => {
@@ -17,7 +21,6 @@ const Home = () => {
           const response = await axios.get(`${process.env.REACT_APP_API_HOST}files`);
           const data = response.data
           setData(data);
-          console.log(data)
         } catch (error) {
           console.error('Failed to fetch data:', error);
         }
@@ -28,16 +31,27 @@ const Home = () => {
 
     const handleUpload = (file) => {
       setData(prevData => [file, ...prevData])
-      console.log(data)
     } 
+
+    const handleItemSelected = (item) => {
+      setItem(item)
+    }
 
 
     return (
         <div>
 
             <div className="table-container">
-                <FileUpload className="upload-btn" handleFileUpload={handleUpload}></FileUpload>
-                <FileTable rows={data}></FileTable>
+                {
+                  item ? (
+                    <File file={item}></File>
+                  ) : (
+                    <div>
+                      <FileUpload className="upload-btn" handleFileUpload={handleUpload}></FileUpload>
+                      <FileTable rows={data} onItemSelected={handleItemSelected}></FileTable>
+                    </div>
+                  )
+                }
 
             </div>
         </div>

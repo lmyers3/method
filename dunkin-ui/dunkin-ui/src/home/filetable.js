@@ -227,11 +227,11 @@ export default function FileTable(props) {
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => {}}
+                    onClick={(event) => {props.onItemSelected(row)}}
                     role="checkbox"
                     aria-checked={isItemSelected}
                     tabIndex={-1}
-                    key={row.name}
+                    key={row.fileName}
                     selected={isItemSelected}
                     sx={{ cursor: 'pointer' }}
                   >

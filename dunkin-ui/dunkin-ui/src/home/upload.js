@@ -19,7 +19,6 @@ class FileUpload extends React.Component {
     let upload = await this.uploadFile(file)
     upload["fileName"] = upload["filename"]
     upload["status"] = "loading"
-    console.log(upload)
 
     this.props.handleFileUpload(upload)
 
