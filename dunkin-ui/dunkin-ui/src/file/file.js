@@ -35,7 +35,10 @@ export default function File(props) {
 
                 <Card sx={{ minWidth: 275 }}>
                     <CardContent>
-                        <Typography variant="h5" component="div">
+                        <Typography variant="h5" component="div" sx={{ mb: 1.5 }}>
+                            {getCardTitleFromStatus(props.file["status"])}
+                        </Typography>
+                        <Typography>
                             {props.file["fileName"]}
                         </Typography>
                         <Typography sx={{ mb: 1.5 }} color="text.secondary">
@@ -61,4 +64,10 @@ export default function File(props) {
             </Container>
         </div>
     )
+}
+
+const getCardTitleFromStatus = (status) => {
+    if (status === 'staged') return "Payment Staging"
+    if (status === 'loaded') return "Payments Loading"
+    if (status === 'processed') return "Payments Processed"
 }
