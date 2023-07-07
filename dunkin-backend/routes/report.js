@@ -3,11 +3,13 @@ const router = express.Router()
 const path = require('path')
 const generateReport = require('../controllers/reportController')
 
-const basePath = path.join(__dirname,'..', '/outbound/reports')
+const basePath = path.join(__dirname,'..', 'outbound')
 
 router.get('/report', generateReport, (req, res) => {
 
-    const filePath = path.join(basePath, req.query['date'], req.query['fileName']);
+    const subdir = req.query["type"] === "all" ? 'processed' : 'reports'
+
+    const filePath = path.join(basePath, subdir, req.query['date'], req.query['fileName']);
 
     let newFileName = req.query['type'] + "_" + req.query['fileName']
 
@@ -22,12 +24,6 @@ router.get('/report', generateReport, (req, res) => {
         res.sendStatus(404);
         }
     });
-
-
-
-//   const readStream = fs.createReadStream(outboundPath)
-
-//   readStream.pipe(res)
 
 })
 
