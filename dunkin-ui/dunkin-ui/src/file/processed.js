@@ -6,6 +6,7 @@ import { Box } from '@mui/material';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import DownloadButton from './downloadbutton';
 
 
 
@@ -16,7 +17,9 @@ export default function ProcessedContent(props) {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_HOST}staging?date=${props.file["date"]}&fileName=${props.file["fileName"]}&phase=processed`);
+          const response = await axios.get(`
+          ${process.env.REACT_APP_API_HOST}staging?date=${props.file["date"]}&fileName=${props.file["fileName"]}&phase=processed`
+          );
           const data = response.data
           setData(data);
         } catch (error) {
@@ -54,15 +57,9 @@ export default function ProcessedContent(props) {
                 <CardActions >
 
                     <Stack spacing={2} direction="column">
-                        <Button variant="outlined">
-                            By Branch
-                        </Button>
-                        <Button variant="outlined">
-                            By Source Account
-                        </Button>
-                        <Button variant="outlined">
-                            All Payments
-                        </Button>
+                        <DownloadButton file={props.file} type="branch"></DownloadButton>
+                        <DownloadButton file={props.file} type="account"></DownloadButton>
+                        <DownloadButton file={props.file} type="all"></DownloadButton>
                     </Stack>
                 </CardActions>
             </Box>
