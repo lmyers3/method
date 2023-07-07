@@ -20,6 +20,8 @@ import Switch from '@mui/material/Switch';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 
+import FileUpload from './upload';
+
 
 
 function descendingComparator(a, b, orderBy) {
@@ -136,6 +138,7 @@ function EnhancedTableToolbar(props) {
         }),
       }}
     >
+        <FileUpload className="upload-btn" handleFileUpload={props.onFileUpload}></FileUpload>
         <Typography
           sx={{ flex: '1 1 100%' }}
           variant="h6"
@@ -204,7 +207,7 @@ export default function FileTable(props) {
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar numSelected={selected.length} onFileUpload={props.onFileUpload}/>
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}

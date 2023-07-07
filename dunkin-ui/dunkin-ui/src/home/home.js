@@ -47,8 +47,7 @@ const Home = () => {
                     <File file={item}></File>
                   ) : (
                     <div>
-                      <FileUpload className="upload-btn" handleFileUpload={handleUpload}></FileUpload>
-                      <FileTable rows={data} onItemSelected={handleItemSelected}></FileTable>
+                      <FileTable rows={data} onItemSelected={handleItemSelected} onFileUpload={handleUpload}></FileTable>
                     </div>
                   )
                 }
