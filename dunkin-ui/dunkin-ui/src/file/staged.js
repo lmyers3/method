@@ -3,7 +3,6 @@ import axios from "axios";
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import CancelIcon from '@mui/icons-material/Cancel';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 
@@ -11,7 +10,6 @@ import Typography from '@mui/material/Typography';
 
 export default function StagedContent(props) {
     const [data, setData] = useState([]);
-
 
     useEffect(() => {
       const fetchData = async () => {
@@ -28,6 +26,19 @@ export default function StagedContent(props) {
   
       fetchData();
     }, [props.file]);
+
+
+    const processPayments = async ( ) => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_HOST}process?date=${props.file["date"]}&fileName=${props.file["fileName"]}`);
+        const data = response.data
+        console.log(data)
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    
+    }
 
     return (
 
@@ -48,16 +59,17 @@ export default function StagedContent(props) {
             Total Payments Rejected: {data["totalRejected"]}
             </Typography>
         </CardContent>
-        <CardActions>
-            <Stack spacing={2} direction="row">
-                <Button variant="outlined">
-                    <CancelIcon/>
+        <Stack spacing={2} direction="row" alignItems="center" justifyContent="center" sx={{mb: 3}}>
+                <Button variant="outlined" sx={{width: '200px'}}>
+                    <CancelIcon sx={{mr: 1.0}}/>
                     Reject
                 </Button>
-                <Button variant="contained">Process Payments</Button>
-            </Stack>
-        </CardActions>
+                <Button variant="contained" sx={{width: '200px'}} onClick={processPayments}>
+                  Process Payments
+                </Button>
+        </Stack>
     </div>    
     )
 
 }
+

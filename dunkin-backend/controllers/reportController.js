@@ -13,7 +13,7 @@ const generateReport = (req, res, next) => {
 
     if (type === "all") next()
 
-    const map = {}
+    const map = {} 
 
     const stream = fs.createReadStream(filePath).pipe(csv())
 

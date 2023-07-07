@@ -3,9 +3,12 @@ const router = express.Router()
 const {processPayments} = require('../controllers/paymentProcessController')
 
 
-router.get('/process', [processPayments], (req, res) => {
+router.get('/process', processPayments, (req, res) => {
 
-  res.json(req["file"])
+  res.json( {
+    "message": "Successfully initiated payment process",
+    "success": true
+  } )
 
 })
 

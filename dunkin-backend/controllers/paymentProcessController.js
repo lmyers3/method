@@ -25,6 +25,8 @@ const processPayments = (req, res, next) => {
                 return
             }
 
+            next()
+
             promiseQueue = promiseQueue.then (async () => {
 
                 if (row["stagingStatus"] === "success") {
@@ -57,11 +59,7 @@ const processPayments = (req, res, next) => {
         .on('end', async () => { 
             await promiseQueue; 
             console.log('CSV file successfully processed');
-            let name = await renameFile(newDate, newFileName); 
-            req["file"] = {
-                "fileName": name,
-                "date": newDate
-            }
+            await renameFile(newDate, newFileName); 
             await softDelFile(req.query["date"], req.query["fileName"])
             next()
         })
