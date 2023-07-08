@@ -17,7 +17,7 @@ const makePayment = (source, destination, amount) => {
         try {
             await sharedResource.waitForReady()
             response = await axios.post(`${host}payments`, payment)
-            throw new Error("hello")
+            
         } catch (error) {
             console.error('Error making the request', error)
             if (error.response) {
