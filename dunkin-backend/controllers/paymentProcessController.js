@@ -17,17 +17,14 @@ const processPayments = (req, res, next) => {
 
     stream
         .on('data', async (row) => {
-            stream.pause()
-
-            index++;
-            if (index == 1) {
-                stream.resume()
-                return
-            }
 
             next()
 
             promiseQueue = promiseQueue.then (async () => {
+                index++;
+                if (index == 1) {
+                    return
+                }
 
                 if (row["stagingStatus"] === "success") {
                     try {
@@ -50,9 +47,6 @@ const processPayments = (req, res, next) => {
                 }
                 await writePaymentToCSV(newDate, newFileName, row)
     
-                console.log(row); 
-                stream.resume();
-
             })
 
         })

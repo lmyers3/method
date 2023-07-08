@@ -44,7 +44,7 @@ const Home = () => {
             <div className="table-container">
                 {
                   item ? (
-                    <File file={item}></File>
+                    <File file={item} onItemSelected={handleItemSelected}></File>
                   ) : (
                     <div>
                       <FileTable rows={data} onItemSelected={handleItemSelected} onFileUpload={handleUpload}></FileTable>

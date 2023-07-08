@@ -38,7 +38,10 @@ const findOutboundFilesHelper = async (subdir) => {
             }
           }
           else if (subdir == 'processed') {
-            status = 'processed'
+            status = 'processing'
+            if(name.includes('.done')) {
+              status = 'processed'
+            }
           }
           paymentFiles.push({"fileName":name, "date":folderName, "status":status})
         

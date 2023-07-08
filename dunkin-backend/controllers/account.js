@@ -74,9 +74,6 @@ const linkLiability = (entityId, account, merchants) => {
             await sharedResource.waitForReady()
             response = await axios.post(`${host}accounts`, liability)
         } catch (error) {
-            if (retryCount === 0) {
-                throw new Error('Maximum retries exceeded');
-            }
             console.error('Error making the request', error)
             if (error.response) {
                 console.log('Response data:', error.response.data);

@@ -25,12 +25,11 @@ const parseCsvFile = (req, res, next) => {
             if (status == "rejected") summary["totalRejected"]++
             if (status == "success") summary["totalSuccess"]++
 
-            if (index <= 20) summary["payments"].push(row)
+            if (index <= 50) summary["payments"].push(row)
             
-            console.log(row); 
+
         })
         .on('end', () => {
-            console.log('CSV file successfully processed');
             req["summary"] = summary
             next()
         })

@@ -6,6 +6,8 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 
+import PaymentsTable from './paymentstable';
+
 
 
 export default function StagedContent(props) {
@@ -27,9 +29,11 @@ export default function StagedContent(props) {
       fetchData();
     }, [props.file]);
 
+    const handleReject = () => {props.onItemSelected(null)}
 
     const processPayments = async ( ) => {
       try {
+        props.onItemSelected(null)
         const response = await axios.get(
           `${process.env.REACT_APP_API_HOST}process?date=${props.file["date"]}&fileName=${props.file["fileName"]}`);
         const data = response.data
@@ -60,7 +64,7 @@ export default function StagedContent(props) {
             </Typography>
         </CardContent>
         <Stack spacing={2} direction="row" alignItems="center" justifyContent="center" sx={{mb: 3}}>
-                <Button variant="outlined" sx={{width: '200px'}}>
+                <Button variant="outlined" sx={{width: '200px'}} onClick={handleReject}>
                     <CancelIcon sx={{mr: 1.0}}/>
                     Reject
                 </Button>
@@ -68,6 +72,8 @@ export default function StagedContent(props) {
                   Process Payments
                 </Button>
         </Stack>
+
+        <PaymentsTable rows={data["payments"]} type="staging"></PaymentsTable>
     </div>    
     )
 

@@ -1,6 +1,5 @@
 // SharedResource.js
 class SharedResource {
-    // throttleLimit = 5000
     throttleLimit = 100 
     constructor() {
       if (!SharedResource.instance) {

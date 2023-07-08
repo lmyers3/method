@@ -30,13 +30,12 @@ const execute = (req, res, next) => {
     const xml = new XmlStream(stream)
 
     promiseQueue = promiseQueue
+      .then(() => req["outbound"]= stagingFile)
+      .then(() => next())
       .then(() => fetchCorpAccounts(corpId, sourceAccounts))
-      .then(() => console.log(sourceAccounts))
 
     xml.on('endElement: row', async(chunk) => {
       promiseQueue = promiseQueue
-        .then(() => req["outbound"]= stagingFile)
-        .then(() => next())
         .then(() => stagePayment(chunk, payments))
         .then(() => findMerchantId(getPlaidId(chunk), merchants))
     })

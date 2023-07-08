@@ -35,12 +35,8 @@ async function writePaymentToCSV(date, filename, data) {
     append: true
   });
 
-  console.log(data)
-
   await csvWriter
     .writeRecords([data])
-
-    console.log(`Data written to file ${filename} successfully.`);
   
   return true
 }

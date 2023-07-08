@@ -6,6 +6,7 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import DownloadButton from './downloadbutton';
+import PaymentsTable from './paymentstable';
 
 
 
@@ -63,6 +64,8 @@ export default function ProcessedContent(props) {
                 </CardActions>
             </Box>
         </CardContent>
+
+        <PaymentsTable rows={data["payments"]} type="processing"></PaymentsTable>
         
     </div>    
     )
