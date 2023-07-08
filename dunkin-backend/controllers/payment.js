@@ -12,17 +12,19 @@ const makePayment = (source, destination, amount) => {
         "destination": destination,
         "description": "Simple Pmt"
     }
-    return new Promise( async resolve => {
+    return new Promise( async (resolve, reject) => {
         let response 
         try {
             await sharedResource.waitForReady()
             response = await axios.post(`${host}payments`, payment)
+            throw new Error("hello")
         } catch (error) {
             console.error('Error making the request', error)
             if (error.response) {
                 console.log('Response data:', error.response.data);
                 console.log('Response status:', error.response.status);
             }
+            reject("Error while processing payment")
         }
 
         resolve(response.data)

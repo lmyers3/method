@@ -61,7 +61,8 @@ async function processRow(newDate, newFileName, row, index) {
             row["paymentId"] = response["data"]["id"]
         } catch (err) {
             console.error('An error occurred while making the payment:', err);
-            throw err;
+            row["paymentStatus"] = "rejected"
+            row["paymentId"] = null
         }
     }
     else if (row["stagingStatus"] === "rejected") {
