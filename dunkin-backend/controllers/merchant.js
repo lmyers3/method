@@ -25,7 +25,7 @@ const findMerchantId = (plaidId, merchants) => {
                     console.log('Response status:', error.response.status);
                 }
             }
-            if (!response.data.data?.length) {
+            if (!response?.data?.data?.length) {
                 merchants[plaidId] = "INVALID"
                 resolve(false)
             } else {

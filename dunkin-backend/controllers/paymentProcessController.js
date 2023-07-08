@@ -16,38 +16,11 @@ const processPayments = (req, res, next) => {
     let promiseQueue = Promise.resolve()
 
     stream
-        .on('data', async (row) => {
-
-            next()
-
-            promiseQueue = promiseQueue.then (async () => {
-                index++;
-                if (index == 1) {
-                    return
-                }
-
-                if (row["stagingStatus"] === "success") {
-                    try {
-                        let response = await makePayment(
-                            row["srcAccountId"],
-                            row["destination"],
-                            parseInt(row["amount"])
-                        )
-                        row["paymentStatus"] = response["success"] ? "success" : "rejected"
-                        row["paymentId"] = response["data"]["id"]
-                    } catch (err) {
-                        console.error('An error occurred while making the payment:', err);
-                        next(err);
-                        return;
-                    }
-                }
-                else if (row["stagingStatus"] === "rejected") {
-                    row["paymentStatus"] = "rejected"
-                    row["paymentId"] = null
-                }
-                await writePaymentToCSV(newDate, newFileName, row)
-    
-            })
+        .on('data', (row) => {
+            promiseQueue = promiseQueue
+            .then(() => next())
+            .then(() => index++)
+            .then(() => processRow(newDate, newFileName, row, index))
 
         })
         .on('end', async () => { 
@@ -73,6 +46,29 @@ const deleteStagedFile = async (req, res, next) => {
         console.error('Error:', error);
         next(error);
     }
+}
+
+async function processRow(newDate, newFileName, row, index) {
+    if (index === 1) return
+    if (row["stagingStatus"] === "success") {
+        try {
+            let response = await makePayment(
+                row["srcAccountId"],
+                row["destination"],
+                parseInt(row["amount"])
+            )
+            row["paymentStatus"] = response["success"] ? "success" : "rejected"
+            row["paymentId"] = response["data"]["id"]
+        } catch (err) {
+            console.error('An error occurred while making the payment:', err);
+            throw err;
+        }
+    }
+    else if (row["stagingStatus"] === "rejected") {
+        row["paymentStatus"] = "rejected"
+        row["paymentId"] = null
+    }
+    await writePaymentToCSV(newDate, newFileName, row)
 }
 
 

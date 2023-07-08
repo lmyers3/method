@@ -1,3 +1,5 @@
+
+
 -----SETUP-----
 1. Use the EDIT.env files to enter your environment variables. For this project I made the assumption Dunkin Donuts is already onboarded as an entity so all
     we have to do is provide the entity id
@@ -5,7 +7,7 @@
 
 Hi welcome to my project!
 
-I am Lindsey Myers a software developer with one year of experience at Visa on the B2B Payables Automation team, automating the B2B payment flow.
+I am Lindsey Myers, a software developer with one year of experience at Visa on the B2B Payables Automation team, automating the B2B payment flow.
 Most of my experience is in Java using the Spring Framework so developing this project in Node.js, Express.js, and React.js was a challenge for me
 that pushed me to learn a lot about these stacks in a short amount of time. I developed this in my freetime (after work) so some of this code is rushed
 and could use a later refactoring.
@@ -33,10 +35,11 @@ instead of the local file system. Another way to improve the system (yes I know 
 will be routinely accessed, this could be employees and their linked liabilities that are paid every two weeks. This way, we no longer 
 have to create a new entity and link their liability every time, but instead do it once and reuse thier entity and liability for other
 payments in the future. This also improves the trackability of payments over time and speeds up our processing by reducing api calls.
-I can also speed up the proccessing by processing payments in parallel.
+I can also speed up the proccessing by processing payments in parallel but this requires me to be cautious about memory and cpu usage.
 
 Frontend: The frontend is simplistic and there could be some enhancements here to display data in a more meaningful way. The user will
 start by viewing a table with all of their previous files that have been processed (currently persisting this in the local file system).
+Each of these files will have an assigned file id which is part of the file name.
 From there they can upload a file to be staged or view their previous files. Uploading a file will initiate the staging process and 
 the file will be displayed as loading. Once the staging is complete the user will need to refresh their browser to see that the file
 has been staged (this could be more responsive). The user can then click on their staged file and choose to reject or initiating payment

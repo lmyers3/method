@@ -3,5 +3,5 @@ uploads/**
 !uploads/shortdata.xml
 **/outbound/**
 !**/outbound/blank.csv
-.env copy
+.env
 
