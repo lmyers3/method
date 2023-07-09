@@ -4,6 +4,19 @@
 1. Use the EDIT.env files to enter your environment variables. For this project I made the assumption Dunkin Donuts is already onboarded as an entity so all
     we have to do is provide the entity id
 2. In the EDIT.env file enter your api key and then rename this file to just .env
+3. In the dunkin-backend dir make sure you have these folders (add these as empty folders) in the root of the backend project
+    --outbound
+        --processed (indented are under outbounds dir)
+        --staging
+        --reports
+    --uploads
+
+    
+
+
+
+
+
 
 Hi welcome to my project!
 
