@@ -41,6 +41,24 @@ async function writePaymentToCSV(date, filename, data) {
   return true
 }
 
+async function writeBatchToCSV(date, filename, data) {
+  let filePath = path.join(basePath, date, filename)
+  await fs.mkdir(path.join(basePath, date), { recursive: true})
+
+  await checkFileAndWriteHeader(filePath, header)
+
+  const csvWriter = createCsvWriter({
+    path: filePath,
+    header: header,
+    append: true
+  });
+
+  await csvWriter
+    .writeRecords(data)
+  
+  return true
+}
+
 async function checkFileAndWriteHeader(filePath, header) {
   try {
     await fs.access(filePath);
@@ -122,4 +140,4 @@ function deleteFile(filePath) {
 
   
 
-module.exports = {writePaymentToCSV, deleteFile, softDelFile, getDateString, renameFile}
+module.exports = {writeBatchToCSV, writePaymentToCSV, deleteFile, softDelFile, getDateString, renameFile}
